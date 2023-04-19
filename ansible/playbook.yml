@@ -18,3 +18,61 @@
         - Django
         - gunicorn
         - psycopg2-binary
+
+- name: Deploy Django application
+  become: true
+  hosts: webservers
+  tasks:
+    - name: Copy Django application files
+      copy:
+        src: "{{ playbook_dir }}/todoApp/"
+        dest: "/home/ubuntu/todoApp/"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+      notify:
+        - Restart Gunicorn
+
+    - name: Create virtual environment
+      command: python3 -m venv /home/ubuntu/todoApp/myvenv
+      args:
+        creates: /home/ubuntu/todoApp/myvenv
+
+    - name: Install Python packages in virtual environment
+      pip:
+        requirements: /home/ubuntu/todoApp/requirements.txt
+        virtualenv: /home/ubuntu/todoApp/myvenv
+
+    - name: Configure Gunicorn
+      template:
+        src: "{{ playbook_dir }}/gunicorn.service.j2"
+        dest: /etc/systemd/system/gunicorn.service
+        owner: root
+        group: root
+        mode: '0644'
+      notify:
+        - Reload Systemd
+
+    - name: Start Gunicorn
+      systemd:
+        name: gunicorn
+        state: started
+        enabled: true
+      notify:
+        - Reload Nginx
+
+  handlers:
+    - name: Restart Gunicorn
+      systemd:
+        name: gunicorn
+        state: restarted
+
+    - name: Reload Nginx
+      systemd:
+        name: nginx
+        state: reloaded
+
+    - name: Reload Systemd
+      systemd:
+        daemon_reload: yes
+

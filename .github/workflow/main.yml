@@ -1,4 +1,4 @@
-name: Deploy Django app to EC2
+name: Deploy Django app to EC2 using Ansible
 
 on:
   push:
@@ -49,31 +49,25 @@ jobs:
         env:
           TF_CLI_AUTO_APPROVE: 1          
 
-      - name: Deploy in EC2
+      - name: Install Ansible on EC2
         env:
-            PRIVATE_KEY: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY  }}
-            HOSTNAME : 3.112.209.2
-            USER_NAME : ${{ env.EC2_INSTANCE_USERNAME }}
-      
+          PRIVATE_KEY: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
+          HOSTNAME: 3.112.209.2
+          USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
-          sudo apt-get update
-          sudo apt-get install -y supervisor nginx
-          sudo rm /etc/nginx/sites-enabled/default
-          sudo systemctl restart nginx
-          sudo systemctl reload nginx
-          sudo supervisorctl reread
-          sudo supervisorctl update
-          sudo supervisorctl start django
-          cd ~/
-          sudo git clone https://github.com/saurav-kumar-mce/ec2-django.git /home/ubuntu/ec2-django
-          cd ~/ec2-django
-          sudo apt-get install -y python3-pip
-          pip install django
-          python manage.py makemigrations
-          python manage.py migrate
-          python manage.py collectstatic --noinput
-          sudo ln -s /etc/nginx/sites-available/django /etc/nginx/sites-enabled/
-          sudo systemctl restart nginx
+          sudo apt update
+          sudo apt install -y software-properties-common
+          sudo apt-add-repository --yes --update ppa:ansible/ansible
+          sudo apt install -y ansible
           '
+
+      - name: Deploy Django app using Ansible
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
+          HOSTNAME: 3.112.209.2
+          USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
+        run: |
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ansible-playbook -i "3.112.209.2," -u ${USER_NAME} --private-key=private_key deploy.yml
