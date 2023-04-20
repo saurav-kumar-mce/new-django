@@ -31,7 +31,7 @@ jobs:
         run: |
           cd terraform
           terraform init \
-            -backend-config="bucket=django-ec2-bucket" \
+            -backend-config="bucket=django-ansible-bucket" \
             -backend-config="key=terraform.tfstate" \
             -backend-config="region=ap-northeast-1"
 
@@ -52,7 +52,7 @@ jobs:
       - name: Install Ansible on EC2
         env:
           PRIVATE_KEY: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
-          HOSTNAME: 3.112.209.2
+          HOSTNAME: ${{ steps.apply.outputs.public_ip }}
           USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
@@ -66,8 +66,8 @@ jobs:
       - name: Deploy Django app using Ansible
         env:
           PRIVATE_KEY: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
-          HOSTNAME: 3.112.209.2
+          HOSTNAME: ${{ steps.apply.outputs.public_ip }}
           USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ansible-playbook -i "3.112.209.2," -u ${USER_NAME} --private-key=private_key deploy.yml
+          ansible-playbook -i "${{ steps.apply.outputs.public_ip }}," -u ${USER_NAME} --private-key=private_key deploy.yml

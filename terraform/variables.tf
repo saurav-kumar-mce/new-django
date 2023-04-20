@@ -12,7 +12,3 @@ variable "key_name" {
   description = "The name of the SSH key pair to associate with the EC2 instance"
   type        = string
 }
-
-#variable "vpc_security_group_ids" {
-  
-#}
