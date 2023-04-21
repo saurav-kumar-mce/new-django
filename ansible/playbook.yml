@@ -48,7 +48,7 @@
     - name: Create virtual environment
       command: python3 -m venv /home/ubuntu/{{ new-django }}/myvenv
       args:
-        creates: /home/ubuntu/{{ new-django }}/myvenv
+        creates: /home/ubuntu/{{ new-django }}/myve3.112.209.2nv
 
     - name: Install Python packages in virtual environment
       pip:
