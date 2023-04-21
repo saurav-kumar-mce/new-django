@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "django-ec2-bucket"
+    bucket = "django-ansible-bucket"
     key    = "terraform.tfstate"
     region = "ap-northeast-1"
   }
