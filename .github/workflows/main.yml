@@ -52,7 +52,7 @@ jobs:
       - name: Install Ansible on EC2
         env:
           PRIVATE_KEY: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
-          HOSTNAME: ${{ steps.apply.outputs.public_ip }}
+          HOSTNAME: 175.41.227.9
           USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
@@ -66,8 +66,8 @@ jobs:
       - name: Deploy Django app using Ansible
         env:
           PRIVATE_KEY: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
-          HOSTNAME: ${{ steps.apply.outputs.public_ip }}
+          HOSTNAME: 175.41.227.9
           USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ansible-playbook -i "${{ steps.apply.outputs.public_ip }}," -u ${USER_NAME} --private-key=private_key playbook.yml
+          ansible-playbook -i "175.41.227.9," -u ${USER_NAME} --private-key=private_key playbook.yml
