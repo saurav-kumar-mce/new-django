@@ -70,4 +70,4 @@ jobs:
           USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ansible-playbook -i "${{ steps.apply.outputs.public_ip }}," -u ${USER_NAME} --private-key=private_key deploy.yml
+          ansible-playbook -i "${{ steps.apply.outputs.public_ip }}," -u ${USER_NAME} --private-key=private_key playbook.yml
