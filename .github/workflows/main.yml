@@ -62,7 +62,9 @@ jobs:
           sudo apt-add-repository --yes --update ppa:ansible/ansible
           sudo apt install -y ansible
           '
-
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3 
+        
       - name: Deploy Django app using Ansible
         env:
           PRIVATE_KEY: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
