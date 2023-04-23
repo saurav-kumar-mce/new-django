@@ -66,7 +66,7 @@ jobs:
           '
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3 
-
+        
       - name: Deploy Django app using Ansible
         env:
           PRIVATE_KEY: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
@@ -74,6 +74,5 @@ jobs:
           USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-#          ansible-playbook -i "13.113.84.108," -u ${USER_NAME} --private-key=private_key ansible/playbook.yml
           ansible-playbook -i ansible/inventory.ini ansible/playbook.yml -u ubuntu --private-key private_key -vvv
 
