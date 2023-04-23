@@ -61,6 +61,8 @@ jobs:
           sudo apt install -y software-properties-common
           sudo apt-add-repository --yes --update ppa:ansible/ansible
           sudo apt install -y ansible
+          sudo apt-get install -y supervisor nginx
+          sudo rm /etc/nginx/sites-enabled/default
           '
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3 
@@ -72,4 +74,6 @@ jobs:
           USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ansible-playbook -i "13.113.84.108," -u ${USER_NAME} --private-key=private_key ansible/playbook.yml
+#          ansible-playbook -i "13.113.84.108," -u ${USER_NAME} --private-key=private_key ansible/playbook.yml
+          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml -u ubuntu --private-key private_key -vvv
+
