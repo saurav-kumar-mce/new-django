@@ -22,6 +22,7 @@
         - Django
         - gunicorn
         - psycopg2-binary
+        - django_extensions
 
 - name: Deploy Django application
   become: true
@@ -29,49 +30,53 @@
   tasks:
     - name: Clone repository
       git:
-        repo: https://github.com/saurav-kumar-mce/https://github.com/saurav-kumar-mce/new-django.git
-        dest: "/home/ubuntu/{{ new-django }}"
+        repo: https://github.com/saurav-kumar-mce/new-django.git
+        dest: "/home/ubuntu/new-django"
         clone: yes
         update: yes
         force: yes
 
-    - name: Copy Django application files
-      copy:
-        src: "{{ playbook_dir }}/{{ new-django }}/"
-        dest: "/home/ubuntu/{{ new-django }}/"
-        owner: ubuntu
-        group: ubuntu
-        mode: '0755'
-      notify:
-        - Restart Gunicorn
-
     - name: Create virtual environment
-      command: python3 -m venv /home/ubuntu/{{ new-django }}/myvenv
+      command: python3 -m venv /home/ubuntu/new-django/myvenv
       args:
-        creates: /home/ubuntu/{{ new-django }}/myvenv
+        creates: /home/ubuntu/new-django/myvenv
 
     - name: Install Python packages in virtual environment
       pip:
-        requirements: /home/ubuntu/{{ new-django }}/requirements.txt
-        virtualenv: /home/ubuntu/{{ new-django }}/myvenv
+        requirements: /home/ubuntu/new-django/requirements.txt
+        virtualenv: /home/ubuntu/new-django/myvenv
 
-    - name: Configure Gunicorn
-      template:
-        src: "{{ playbook_dir }}/gunicorn.service.j2"
-        dest: /etc/systemd/system/gunicorn.service
+    - name: Configure Nginx
+      copy:
+        src: "/home/ubuntu/new-django/nginx.conf"
+        dest: /etc/nginx/sites-available/django
         owner: root
         group: root
         mode: '0644'
-      notify:
-        - Reload Systemd
+    
+    - name: Enable Nginx site
+      file:
+        src: /etc/nginx/sites-available/django
+        dest: /etc/nginx/sites-enabled/django
+        state: link
+
+    - name: Configure Supervisor
+      copy:
+        src: "/home/ubuntu/new-django/supervisor.conf"
+        dest: /etc/supervisor/conf.d/django.conf 
+
+    - name: Reload Supervisor
+      command: supervisorctl reread && supervisorctl update       
 
     - name: Start Gunicorn
       shell: |
-        source /home/ubuntu/{{ new-django }}/myvenv/bin/activate
-        cd /home/ubuntu/{{ new-django }}/
+        source /home/ubuntu/new-django/myvenv/bin/activate
+        cd /home/ubuntu/new-django/
+        python manage.py makemigrations
+        python manage.py migrate
         gunicorn todoApp.wsgi:application --bind 0.0.0.0:8000
       environment:
-        PATH: "/home/ubuntu/{{ new-django }}/myvenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        PATH: "/home/ubuntu/new-django/myvenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       notify:
         - Reload Nginx
 
@@ -85,7 +90,3 @@
       systemd:
         name: nginx
         state: reloaded
-
-    - name: Reload Systemd
-      systemd:
-        daemon_reload: yes
