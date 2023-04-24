@@ -41,15 +41,16 @@
       args:
         creates: /home/ubuntu/new-django/myvenv
 
-    - name: Install Python packages in virtual environment
-      pip:
-        requirements: /home/ubuntu/new-django/requirements.txt
-        virtualenv: /home/ubuntu/new-django/myvenv
+#    - name: Install Python packages in virtual environment
+#      pip:
+#        requirements: /home/ubuntu/new-django/requirements.txt
+#        virtualenv: /home/ubuntu/new-django/myvenv
 
     - name: Configure Nginx
       copy:
         src: "/home/ubuntu/new-django/nginx.conf"
         dest: /etc/nginx/sites-available/django
+        remote_src: yes
         owner: root
         group: root
         mode: '0644'
@@ -63,18 +64,22 @@
     - name: Configure Supervisor
       copy:
         src: "/home/ubuntu/new-django/supervisor.conf"
-        dest: /etc/supervisor/conf.d/django.conf 
-
-    - name: Reload Supervisor
-      command: supervisorctl reread && supervisorctl update       
-
+        dest: /etc/supervisor/conf.d/django.conf
+        remote_src: yes 
+    
+    - name: Configure Supervisor
+      copy:
+        src: "/home/ubuntu/new-django/gunicorn.service"
+        dest: /etc/supervisor/conf.d/gunicorn.service
+        remote_src: yes
+        
     - name: Start Gunicorn
       shell: |
         source /home/ubuntu/new-django/myvenv/bin/activate
         cd /home/ubuntu/new-django/
         python manage.py makemigrations
         python manage.py migrate
-        gunicorn todoApp.wsgi:application --bind 0.0.0.0:8000
+        gunicorn todoApp.wsgi:application --bind 0.0.0.0:8002
       environment:
         PATH: "/home/ubuntu/new-django/myvenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       notify:
