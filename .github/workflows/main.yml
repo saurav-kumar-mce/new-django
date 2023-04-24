@@ -60,8 +60,7 @@ jobs:
       - name: Retrieve EC2 Public IP    
         run: |
           echo "::set-output name=public_ip::$(aws ec2 describe-instances --filters 'Name=instance-state-name,Values=running' --query 'Reservations[].Instances[].PublicIpAddress' --output text)"
-        id: extract-public-ip
-        needs: ec2-public-ip   
+        id: extract-public-ip 
 
       - name: Install Ansible on EC2
         env:
