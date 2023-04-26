@@ -65,6 +65,7 @@ jobs:
       - name: Set hostname
         run: |
           echo "HOSTNAME=$(echo ${{ steps.ec2-public-ip.outputs.public_ip }})" >> $GITHUB_ENV
+          id: set-hostname
   
 
       - name: Install Ansible on EC2
