@@ -24,6 +24,15 @@
           - python3-venv
         state: latest
 
+    - name: Install required packages
+      pip:
+        name: "{{ item }}"
+      with_items:
+        - Django
+        - gunicorn
+        - psycopg2-binary
+        - django_extensions    
+
     - name: Clone repository
       git:
         repo: "{{ app_repo }}"
@@ -42,10 +51,16 @@
 #        requirements: "{{ app_path }}/requirements.txt"
 #        virtualenv: "{{ virtualenv_path }}"
 
+    - name: Make and run database migrations
+      command: python3 {{ app_path }}/manage.py migrate
+      environment:
+        DJANGO_SETTINGS_MODULE: "{{ app_name }}.settings"
+
     - name: Configure Nginx
-      template:
+      copy:
         src: "{{ app_path }}/devops/nginx.conf"
         dest: "{{ nginx_conf_path }}"
+        remote_src: yes
         owner: root
         group: root
         mode: '0644'
@@ -59,16 +74,18 @@
         state: link
 
     - name: Configure Supervisor
-      template:
+      copy:
         src: "{{ app_path }}/devops/supervisor.conf"
         dest: "{{ supervisor_conf_path }}"
+        remote_src: yes
       notify:
         - Restart Gunicorn
 
     - name: Configure Gunicorn service
-      template:
+      copy:
         src: "{{ app_path }}/devops/gunicorn.service"
         dest: "{{ gunicorn_service_path }}"
+        remote_src: yes
         owner: root
         group: root
         mode: '0644'
