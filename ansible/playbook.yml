@@ -67,7 +67,7 @@
         dest: /etc/supervisor/conf.d/django.conf
         remote_src: yes 
     
-    - name: Configure Supervisor
+    - name: Configure gunicorn
       copy:
         src: "/home/ubuntu/new-django/devops/gunicorn.service"
         dest: /etc/supervisor/conf.d/gunicorn.service
