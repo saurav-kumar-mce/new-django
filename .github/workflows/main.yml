@@ -49,6 +49,13 @@ jobs:
         env:
           TF_CLI_AUTO_APPROVE: 1 
 
+      - name: Wait for EC2 instance to be created
+        uses: aws-actions/wait-for-ec2-instance@v1
+        with:
+          instance-id: ${{ steps.apply.outputs.instance_id }}
+          fail-on-timeout: true
+          timeout: '2m'    
+
       - name: Get EC2 Public IP
         id: ec2-public-ip
         uses: aws-actions/configure-aws-credentials@v1
@@ -99,6 +106,6 @@ jobs:
         run: |
           wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
           chmod +x wait-for-it.sh
-          ./wait-for-it.sh $EC2_PUBLIC_IP:8002 -t 120 -- echo "Django app is now available!"
+          ./wait-for-it.sh $EC2_PUBLIC_IP:8002/todos -t 120 -- echo "Django app is now available!"
     
 
