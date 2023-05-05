@@ -7,11 +7,12 @@
 
   roles:
     - python  # Install Python and pip
-    - django  # Clone Django app repository, install dependencies, and run migrations
+#    - django  # Clone Django app repository, install dependencies, and run migrations
     - nginx   # configure Nginx as reverse proxy for Django app
     - supervisor # Install and configure Supervisor to manage Gunicorn process
-    - gunicorn   # configure Gunicorn to run Django app
+    - handlers
+#    - gunicorn   # configure Gunicorn to run Django app
 
   vars_files:
     - vars/common.yml   # Load common variables
-    - vars/secrets.yml  # Load encrypted variables for sensitive data
+#    - vars/secrets.yml  # Load encrypted variables for sensitive data
