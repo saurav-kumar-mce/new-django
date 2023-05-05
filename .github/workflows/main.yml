@@ -49,12 +49,12 @@ jobs:
         env:
           TF_CLI_AUTO_APPROVE: 1 
 
-      - name: Wait for EC2 instance to be created
-        uses: aws-actions/wait-for-ec2-instance@v1
-        with:
-          instance-id: ${{ steps.apply.outputs.instance_id }}
-          fail-on-timeout: true
-          timeout: '2m'    
+#      - name: Wait for EC2 instance to be created
+#        uses: aws-actions/wait-for-ec2-instance@v1
+#        with:
+#          instance-id: ${{ steps.apply.outputs.instance_id }}
+#          fail-on-timeout: true
+#          timeout: '2m'    
 
       - name: Get EC2 Public IP
         id: ec2-public-ip
