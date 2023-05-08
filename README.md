@@ -72,4 +72,6 @@ The workflow consists of the following steps:
 2. The ansible-playbook command deploys the Django app to the EC2 instance and starts a Gunicorn server to serve the app.
 
 
-Once the deployment process is completed successfully, you can access your Django app by visiting http://<public-ip-address>:8000/todos in your web browser. Cheers and Happy Coding :)
+Once the deployment process is completed successfully, you can access your Django app by visiting http://public-ip-address:8000/todos in your web browser.
+
+ Cheers and Happy Coding :)
