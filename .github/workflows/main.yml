@@ -29,7 +29,7 @@ jobs:
 
       - name: Initialize Terraform
         run: |
-          cd terraform
+          cd devops/terraform
           terraform init \
             -backend-config="bucket=django-ansible-bucket" \
             -backend-config="key=terraform.tfstate" \
@@ -38,13 +38,13 @@ jobs:
       - name: Plan Terraform
         id: plan
         run: |
-          cd terraform
+          cd devops/terraform
           terraform plan -out=plan.tfplan
 
       - name: Apply Terraform
         id: apply
         run: |
-          cd terraform
+          cd devops/terraform
           terraform apply -auto-approve plan.tfplan
         env:
           TF_CLI_AUTO_APPROVE: 1 
@@ -98,7 +98,7 @@ jobs:
           USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ansible-playbook -i ansible/inventory.ini ansible/deployment.yml -u ubuntu --private-key private_key -vvv
+          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml -u ubuntu --private-key private_key -vvv
 
       - name: Wait for Django app to become available
         env:
@@ -106,6 +106,6 @@ jobs:
         run: |
           wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
           chmod +x wait-for-it.sh
-          ./wait-for-it.sh $EC2_PUBLIC_IP:8002/todos -t 120 -- echo "Django app is now available!"
+          ./wait-for-it.sh $EC2_PUBLIC_IP:8000/todos -t 120 -- echo "Django app is now available!"
     
 

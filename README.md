@@ -1,50 +1,64 @@
-# django-todo
-#saurav
-A simple todo app built with django
+## Automated Deployment of Django App to AWS EC2 using Github-Action CI/CD
 
-![todo App](https://raw.githubusercontent.com/shreys7/django-todo/develop/staticfiles/todoApp.png)
-### Setup
-Update the System
-```bash
-sudo apt-get update
-```
-To get this repository, run the following command inside your git enabled terminal
-```bash
-git clone htthttps://github.com/saurav-kumar-mce/ec2-django.git
-```
-You will need django to be installed in you computer to run this app. Head over to https://www.djangoproject.com/download/ for the download guide
+To automate the deployment process for the Django projects, I've created a Github Action workflow that will deploy the Django-app to an AWS EC2 instance using Ansible.
 
-Download django usig pip
-```bash
-sudo apt install python3-pip -y
-```
-```bash
-pip install django
-```
-Once you have downloaded django, go to the cloned repo directory and run the following command
+Prerequisites:
 
-```bash
-python3 manage.py makemigrations
-```
+1.GitHub account
+2.AWS account
+3.Ansible
+4.Terraform
 
-This will create all the migrations file (database migrations) required to run this App.
+# Setup
 
-Now, to apply this migrations run the following command
-```bash
-python3 manage.py migrate
-```
+1. Create an EC2 instance using Terraform: The workflow will trigger Terraform code located in the devops/terraform directory to create an EC2 instance on AWS. Before proceeding with the deployment, ensure that you have set up the AWS credentials with appropriate permissions to create and manage the EC2 instance.
 
-One last step and then our todo App will be live. We need to create an admin user to run this App. On the terminal, type the following command and provide username, password and email for the admin user
-```bash
-python3 manage.py createsuperuser
-```
+2. Set up AWS credentials: You can create an IAM user and generate an access key and secret access key. These credentials will be used by Terraform and Ansible to access your AWS account and deploy your Django app.
 
-That was pretty simple, right? Now let's make the App live. We just need to start the server now and then we can start using our simple todo App. Start the server by following command
+3. Install Terraform: You need to install Terraform on your local machine to run the Terraform code and create the EC2 instance on AWS.
+ You can find the installation guide on the official Terraform website.
+https://developer.hashicorp.com/terraform/downloads?product_intent=terraform
 
-```bash
-python3 manage.py runserver
-```
+4. Add the following secrets to your GitHub repository:
 
-Once the server is hosted, head over to http://127.0.0.1:8000/todos for the App.
+5.AWS_ACCESS_KEY_ID: AWS access key ID.
 
-Cheers and Happy Coding :)
+6.AWS_SECRET_ACCESS_KEY: AWS secret access key.
+
+7.AWS_REGION: The AWS region in which you want to create the EC2 instance.
+
+8.TF_VAR_AMI: The ID of the Amazon Machine Image (AMI) that you want to use for the EC2 instance.
+
+9.TF_VAR_KEY_NAME: The name of the EC2 key pair that you want to use for the instance.
+
+10.EC2_INSTANCE_PRIVATE_KEY: The private key for the EC2 key pair that you want to use for the instance also be used for the ssh to ec2 instance via github action workflow.
+
+
+11.Commit and push the changes to the repository. The GitHub Action workflow will be triggered automatically.
+
+# Workflow
+
+The workflow consists of the following steps:
+
+1.Checkout code from GitHub.
+2.Install Terraform.
+3.Initialize Terraform.
+4.Plan Terraform.
+5.Apply Terraform.
+6.Get the public IP address of the EC2 instance.
+7.Set the hostname of the EC2 instance.
+8.Install Ansible on the EC2 instance.
+9.Setup tmate session.
+10.Deploy Django app using Ansible.
+11.Wait for Django app to become available.
+
+# Notes
+
+1. The devops directory contains the Terraform and Ansible code, as well as the configuration files for Nginx, Supervisor, and Gunicorn. The Terraform code is located in the devops/terraform directory, while the Ansible configuration files are located in the devops/ansible directory. The configuration files for Nginx, Supervisor, and Gunicorn are located in the devops/config directory.
+
+1. The terraform apply command creates an EC2 instance and a security group. The security group allows incoming traffic on port 22 (SSH) and port 8002 (Django app).
+
+2. The ansible-playbook command deploys the Django app to the EC2 instance and starts a Gunicorn server to serve the app.
+
+
+Once the deployment process is completed successfully, you can access your Django app by visiting http://<public-ip-address>:8000/todos in your web browser. Cheers and Happy Coding :)

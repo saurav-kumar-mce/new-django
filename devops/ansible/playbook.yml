@@ -2,9 +2,10 @@
 # This playbook installs and configures a Django application on remote webservers
 ---
 - name: Deploy Django application
-  hosts: webservers
-  become: true
+  hosts: webservers # Define the webservers that the application will be deployed to
+  become: true # Become the root user on the webservers to run privileged tasks
 
+# Include the roles needed to deploy the Django application
   roles:
     - python  # Install Python and pip
 #    - django  # Clone Django app repository, install dependencies, and run migrations
