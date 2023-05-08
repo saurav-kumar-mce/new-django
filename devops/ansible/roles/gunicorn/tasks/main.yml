@@ -19,10 +19,3 @@
     PATH: "/home/ubuntu/new-django/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   notify:
     - Reload Nginx
-    
-
-- name: Start Gunicorn
-  systemd:
-    name: gunicorn
-    state: started
-    enabled: yes

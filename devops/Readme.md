@@ -34,6 +34,26 @@ The config files contains the configuration files for the following components:
 
 The ansible directory contains the playbook and roles needed to deploy the Django application on remote webservers. The playbook is defined in ansible/playbook.yml and includes the following roles:
 
+├── ansible
+  ├── inventory.ini 
+│ ├── playbook.yml
+│ ├── roles
+│ │ ├── python
+│ │ │ ├── tasks
+│ │ │ │ └── main.yml
+│ │ ├── nginx
+│ │ │ ├── tasks
+│ │ │ │ └── main.yml
+│ │ ├── supervisor
+│ │ │ ├── tasks
+│ │ │ │ └── main.yml
+│ │ ├── gunicorn
+│ │ │ ├── tasks
+│ │ │ │ └── main.yml
+│ │ ├── handlers
+│ │ │ ├── tasks
+│ │ │ │ └── main.yml
+
 1. python: Installs Python and pip on the remote webservers.
 
 2. nginx: Configures Nginx as a reverse proxy for the Django app.
@@ -60,3 +80,4 @@ The roles directory contains the following subdirectories:
 4. gunicorn: Contains the tasks to configure Gunicorn to run the Django app. 
 
 5. handlers: Contains the handlers that can be used to restart services if configuration files change.
+

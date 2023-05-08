@@ -11,9 +11,8 @@
 #    - django  # Clone Django app repository, install dependencies, and run migrations
     - nginx   # configure Nginx as reverse proxy for Django app
     - supervisor # Install and configure Supervisor to manage Gunicorn process
-    - handlers
     - gunicorn   # configure Gunicorn to run Django app
-
+    - handlers   # restart services if configuration files change.
   vars_files:
     - vars/common.yml   # Load common variables
 #    - vars/secrets.yml  # Load encrypted variables for sensitive data
