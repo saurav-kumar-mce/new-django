@@ -5,8 +5,11 @@ To automate the deployment process for the Django projects, I've created a Githu
 Prerequisites:
 
 1.GitHub account
+
 2.AWS account
+
 3.Ansible
+
 4.Terraform
 
 # Setup
@@ -21,42 +24,50 @@ https://developer.hashicorp.com/terraform/downloads?product_intent=terraform
 
 4. Add the following secrets to your GitHub repository:
 
-5.AWS_ACCESS_KEY_ID: AWS access key ID.
+   1.AWS_ACCESS_KEY_ID: AWS access key ID.
 
-6.AWS_SECRET_ACCESS_KEY: AWS secret access key.
+   2.AWS_SECRET_ACCESS_KEY: AWS secret access key.
 
-7.AWS_REGION: The AWS region in which you want to create the EC2 instance.
+   3.AWS_REGION: The AWS region in which you want to create the EC2 instance.
 
-8.TF_VAR_AMI: The ID of the Amazon Machine Image (AMI) that you want to use for the EC2 instance.
+   4.TF_VAR_AMI: The ID of the Amazon Machine Image (AMI) that you want to use for the EC2 instance.
 
-9.TF_VAR_KEY_NAME: The name of the EC2 key pair that you want to use for the instance.
+   5.TF_VAR_KEY_NAME: The name of the EC2 key pair that you want to use for the instance.
 
-10.EC2_INSTANCE_PRIVATE_KEY: The private key for the EC2 key pair that you want to use for the instance also be used for the ssh to ec2 instance via github action workflow.
+   6.EC2_INSTANCE_PRIVATE_KEY: The private key for the EC2 key pair that you want to use for the instance also be used for the ssh to ec2 instance via        github action workflow.
 
 
-11.Commit and push the changes to the repository. The GitHub Action workflow will be triggered automatically.
+5.Commit and push the changes to the repository. The GitHub Action workflow will be triggered automatically.
 
 # Workflow
 
 The workflow consists of the following steps:
 
 1.Checkout code from GitHub.
+
 2.Install Terraform.
+
 3.Initialize Terraform.
+
 4.Plan Terraform.
+
 5.Apply Terraform.
+
 6.Get the public IP address of the EC2 instance.
+
 7.Set the hostname of the EC2 instance.
+
 8.Install Ansible on the EC2 instance.
-9.Setup tmate session.
-10.Deploy Django app using Ansible.
-11.Wait for Django app to become available.
+
+9.Deploy Django app using Ansible.
+
+10.Wait for Django app to become available.
 
 # Notes
 
-1. The devops directory contains the Terraform and Ansible code, as well as the configuration files for Nginx, Supervisor, and Gunicorn. The Terraform code is located in the devops/terraform directory, while the Ansible configuration files are located in the devops/ansible directory. The configuration files for Nginx, Supervisor, and Gunicorn are located in the devops/config directory.
+1. The devops directory contains the Terraform and Ansible code, as well as the configuration files for Nginx, Supervisor, and Gunicorn. The Terraform code is located in the devops/terraform directory, while the Ansible configuration files are located in the devops/ansible directory. The configuration files for Nginx, Supervisor, and Gunicorn are located in the devops directory.
 
-1. The terraform apply command creates an EC2 instance and a security group. The security group allows incoming traffic on port 22 (SSH) and port 8002 (Django app).
+1. The terraform apply command creates an EC2 instance and a security group. The security group allows incoming traffic on port 22 (SSH) and port 8000 (Django app).
 
 2. The ansible-playbook command deploys the Django app to the EC2 instance and starts a Gunicorn server to serve the app.
 
