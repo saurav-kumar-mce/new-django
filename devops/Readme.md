@@ -40,7 +40,7 @@ The ansible directory contains the playbook and roles needed to deploy the Djang
   
 │ ├── playbook.yml
 
-│ ├── roles
+│  ├── roles
 
 │ │ ├── python
 
