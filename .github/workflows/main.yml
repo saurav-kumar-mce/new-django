@@ -98,7 +98,7 @@ jobs:
           USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml -u ubuntu --private-key private_key -vvv
+          ansible-playbook -i devops/ansible/inventory.ini devops/ansible/playbook.yml -u ubuntu --private-key private_key -vvv
 
       - name: Wait for Django app to become available
         env:
