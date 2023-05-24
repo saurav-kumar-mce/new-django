@@ -1,17 +1,68 @@
----
+- name: Check if Nginx configuration exists
+  stat:
+    path: "{{ nginx_conf_path }}"
+  register: nginx_conf_stat
+
+- name: Check if Nginx configuration matches
+  shell: "diff {{ nginx_conf_path }} {{ app_path }}/devops/nginx.conf"
+  register: nginx_conf_diff
+  ignore_errors: true
+
 - name: Configure Nginx
-  copy:
-    src: "{{ app_path }}/devops/nginx.conf"
+  template:
+    src: "{{ app_path }}/devops/nginx.conf.j2"
     dest: "{{ nginx_conf_path }}"
-    remote_src: yes
-    owner: root
-    group: root
     mode: '0644'
-  notify:
     - Reload Nginx
+  when:
+    - nginx_conf_stat.stat.exists == false
+    - nginx_conf_diff.rc != 0
+
+- name: Check if Nginx site is enabled
+  stat:
+    path: "/etc/nginx/sites-enabled/django"
+  register: nginx_site_enabled
 
 - name: Enable Nginx site
   file:
     src: "{{ nginx_conf_path }}"
     dest: "/etc/nginx/sites-enabled/django"
     state: link
+  notify:
+    - Reload Nginx
+  when:
+    - nginx_site_enabled.stat.exists == false
+    - nginx_conf_diff.rc != 0
+
+- name: Check if port {{ gunicorn_port }} is available
+  wait_for:
+    port: "{{ gunicorn_port }}"
+    timeout: 5
+  ignore_errors: true
+  register: port_check
+
+- name: Find available port
+  set_fact:
+    new_gunicorn_port: "{{ gunicorn_port }}"
+  when: port_check.failed
+
+- name: Change Gunicorn port
+  lineinfile:
+    path: "{{ app_path }}/devops/gunicorn.service"
+    regexp: "^ExecStart=/usr/bin/gunicorn"
+    line: "ExecStart=/usr/bin/gunicorn --bind 127.0.0.1:{{ new_gunicorn_port|int + 1 }} myproject.wsgi:application"
+  when: port_check.failed
+
+- name: Restart Gunicorn
+  systemd:
+    name: gunicorn
+    state: restarted
+  when: port_check.failed
+
+- name: Restart Nginx
+  systemd:
+    name: nginx
+    state: restarted
+  when:
+    - nginx_conf_stat.stat.exists == true
+    - nginx_conf_stat.changed

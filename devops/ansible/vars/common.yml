@@ -1,5 +1,11 @@
 ---
 # This file contains common variables used throughout the Ansible playbook.
+server_name: 43.207.105.100
+
+proxy_pass: "http://127.0.0.1:8000"
+
+supervisor_user: ubuntu
+
 
 # Name of the Django application
 app_name: "todoApp"
