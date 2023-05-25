@@ -1,12 +1,11 @@
----
 - name: Check if Gunicorn service exists for Project 1
   stat:
     path: /etc/systemd/system/gunicorn-project1.service
   register: gunicorn_project1_config
 
 - name: Create Gunicorn service file for Project 2
-  copy:
-    src: "{{ app_path }}/devops/gunicorn.service"
+  template:
+    src: "{{ app_path }}/devops/gunicorn.service.j2"
     dest: "{{ gunicorn_service_path }}"
     remote_src: yes
     owner: root

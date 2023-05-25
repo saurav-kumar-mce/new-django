@@ -6,7 +6,9 @@ proxy_pass: "http://127.0.0.1:8000"
 
 supervisor_user: ubuntu
 
+gunicorn_working_directory: /home/ubuntu/new-django
 
+gunicorn_exec_start: /home/ubuntu/new-django/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/run/gunicorn.sock todoApp.wsgi:application --bind 0.0.0.0:8002
 # Name of the Django application
 app_name: "todoApp"
 
