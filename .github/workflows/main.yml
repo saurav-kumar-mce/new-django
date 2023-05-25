@@ -72,7 +72,7 @@ jobs:
       - name: Set hostname
         run: |
           echo "HOSTNAME=$(echo ${{ steps.ec2-public-ip.outputs.public_ip }})" >> $GITHUB_ENV
-          echo "$HOSTNAME" > hostname && chmod 600 hostname
+
   
       - name: Install Ansible on EC2
         env:
@@ -80,6 +80,7 @@ jobs:
           USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
           HOSTNAME: ${{ steps.extract-public-ip.outputs.public_ip }}
         run: |
+          echo "$HOSTNAME" > hostname && chmod 600 hostname        
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME}  '
           sudo apt update
