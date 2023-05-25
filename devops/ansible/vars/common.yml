@@ -1,5 +1,7 @@
 ---
 # This file contains common variables used throughout the Ansible playbook.
+gunicorn_port: "8000"
+
 server_name: 43.207.105.100
 
 proxy_pass: "http://127.0.0.1:8000"
