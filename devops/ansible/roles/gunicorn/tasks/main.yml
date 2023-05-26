@@ -1,21 +1,6 @@
-- name: Check if Gunicorn service exists for Project 1
-  stat:
-    path: /etc/systemd/system/gunicorn-project1.service
-  register: gunicorn_project1_config
-
-- name: Create Gunicorn service file for Project 2
-  template:
-    src: "{{ app_path }}/devops/gunicorn.service.j2"
-    dest: "{{ gunicorn_service_path }}"
-    remote_src: yes
-    owner: root
-    group: root
-    mode: '0644'
-  when: gunicorn_project1_config.stat.exists == false
-
 - name: Configure Gunicorn service
   template:
-    src: "{{ app_path }}/devops/gunicorn.conf.j2"
+    src: "{{ app_path }}/devops/gunicorn.service.j2"
     dest: "{{ gunicorn_service_path }}"
     remote_src: yes
     owner: root
@@ -26,8 +11,9 @@
   shell: |
     source /home/ubuntu/new-django/venv/bin/activate
     cd /home/ubuntu/new-django/
-    gunicorn todoApp.wsgi:application --bind 0.0.0.0:8000
+    gunicorn todoApp.wsgi:application --bind 0.0.0.0:8002
   environment:
     PATH: "/home/ubuntu/new-django/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   notify:
     - Reload Nginx
+
