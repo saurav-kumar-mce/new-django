@@ -1,6 +1,8 @@
+# ansible/roles/gunicorn/tasks/main.yml 
+---
 - name: Configure Gunicorn service
-  template:
-    src: "{{ app_path }}/devops/gunicorn.service.j2"
+  copy:
+    src: "{{ app_path }}/devops/gunicorn.service"
     dest: "{{ gunicorn_service_path }}"
     remote_src: yes
     owner: root
@@ -8,6 +10,7 @@
     mode: '0644'
 
 - name: Start Gunicorn
+# Activate the virtualenv, change to the app directory and start gunicorn using the command-line interface.
   shell: |
     source /home/ubuntu/new-django/venv/bin/activate
     cd /home/ubuntu/new-django/
