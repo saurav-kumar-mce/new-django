@@ -1,16 +1,28 @@
-# ansible/roles/gunicorn/tasks/main.yml 
----
+- name: Check if Gunicorn service exists
+  stat:
+    path: "{{ gunicorn_service_path }}"
+  register: gunicorn_service_exists
+
 - name: Configure Gunicorn service
-  copy:
-    src: "{{ app_path }}/devops/gunicorn.service"
-    dest: "{{ gunicorn_service_path }}"
-    remote_src: yes
-    owner: root
-    group: root
-    mode: '0644'
+  blockinfile:
+    path: "{{ gunicorn_service_path }}"
+    block: |
+      [Unit]
+      Description=gunicorn daemon
+      After=network.target
+      
+      [Service]
+      User=ubuntu
+      Group=www-data
+      WorkingDirectory={{ gunicorn_working_directory }}
+      ExecStart={{ gunicorn_exec_start }}
+      Restart=always
+      
+      [Install]
+      WantedBy=multi-user.target
+  when: gunicorn_service_exists.stat.exists == false or gunicorn_service_exists.stat.islnk == true or gunicorn_service_exists.stat.isreg == false
 
 - name: Start Gunicorn
-# Activate the virtualenv, change to the app directory and start gunicorn using the command-line interface.
   shell: |
     source /home/ubuntu/new-django/venv/bin/activate
     cd /home/ubuntu/new-django/
@@ -19,4 +31,3 @@
     PATH: "/home/ubuntu/new-django/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   notify:
     - Reload Nginx
-
