@@ -1,14 +1,57 @@
-- name: Check if Gunicorn service exists for Project 1
+- name: Check if Gunicorn service exists
   stat:
-    path: /etc/systemd/system/gunicorn-project1.service
-  register: gunicorn_project1_config
+    path: "{{ gunicorn_service_path }}"
+  register: gunicorn_service_exists
 
-- name: Create Gunicorn service file for Project 2
-  template:
-    src: "{{ app_path }}/devops/gunicorn.service.j2"
+- name: Configure Gunicorn service
+  blockinfile:
+    path: "{{ gunicorn_service_path }}"
+    block: |
+      [Unit]
+      Description=gunicorn daemon
+      After=network.target
+      
+      [Service]
+      User=ubuntu
+      Group=www-data
+      WorkingDirectory={{ gunicorn_working_directory }}
+      ExecStart={{ gunicorn_exec_start }}
+      Restart=always
+      
+      [Install]
+      WantedBy=multi-user.target
+  when: gunicorn_service_exists.stat.exists == false or gunicorn_service_exists.stat.islnk == true or gunicorn_service_exists.stat.isreg == false
+
+- name: Start Gunicorn
+  shell: |
+    source /home/ubuntu/new-django/venv/bin/activate
+    cd /home/ubuntu/new-django/
+    gunicorn todoApp.wsgi:application --bind 0.0.0.0:8002
+  environment:
+    PATH: "/home/ubuntu/new-django/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  notify:
+    - Reload Nginx
+
+
+
+# ansible/roles/gunicorn/tasks/main.yml 
+---
+- name: Configure Gunicorn service
+  copy:
+    src: "{{ app_path }}/devops/gunicorn.service"
     dest: "{{ gunicorn_service_path }}"
     remote_src: yes
     owner: root
     group: root
     mode: '0644'
-  when: gunicorn_project1_config.stat.exists == false
+
+- name: Start Gunicorn
+# Activate the virtualenv, change to the app directory and start gunicorn using the command-line interface.
+  shell: |
+    source /home/ubuntu/new-django/venv/bin/activate
+    cd /home/ubuntu/new-django/
+    gunicorn todoApp.wsgi:application --bind 0.0.0.0:8002
+  environment:
+    PATH: "/home/ubuntu/new-django/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  notify:
+    - Reload Nginx
