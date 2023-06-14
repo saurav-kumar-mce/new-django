@@ -94,8 +94,7 @@ jobs:
           sudo apt-get install -y supervisor nginx
           sudo rm -f /etc/nginx/sites-enabled/default
           '
-#      - name: Setup tmate session
-#        uses: mxschmitt/action-tmate@v3        
+        
       - name: Deploy Django app using Ansible
         env:
           PRIVATE_KEY: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
@@ -112,6 +111,6 @@ jobs:
         run: |
           wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
           chmod +x wait-for-it.sh
-          ./wait-for-it.sh $EC2_PUBLIC_IP:8000/todos/ -t 120 -- echo "Django app is now available!"
+          ./wait-for-it.sh $EC2_PUBLIC_IP:8000/todos -t 120 -- echo "Django app is now available!"
     
 
