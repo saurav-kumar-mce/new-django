@@ -6,9 +6,9 @@ This directory contains the Terraform code and Ansible playbooks to automate the
 
 1.The ansible directory contains the following files:
 
-playbook.yml: The Ansible playbook to deploy the Django app to the EC2 instance.
+playbook.yml: This Ansible playbook is responsible for deploying the Django app to the EC2 instance. It defines the tasks and roles needed to configure the server and deploy the application.
 
-inventory.ini: The Ansible inventory file that specifies the host(s) on which the playbook will run.
+inventory.ini: The inventory file specifies the target host(s) on which the playbook will run. It contains the IP addresses or hostnames of the EC2 instance(s) where the Django app will be deployed.
 
 # Terraform
 
@@ -22,13 +22,28 @@ The terraform directory contains the following files:
 
 #  Configuration files
 
-The config files contains the configuration files for the following components:
+The config directory includes the configuration files for the following components:
 
-1. nginx.conf: The configuration file for the Nginx web server.
+nginx.conf.j2: This file is the configuration file for the Nginx web server. It contains settings and directives that define how Nginx should serve the Django app and handle incoming requests. Additionally, the deployment process includes the following steps to handle port conflicts:
 
-2. supervisor.conf: The configuration file for the Supervisor process control system.
+1. Check if the Nginx configuration file exists and if it matches the desired configuration.
 
-3. gunicorn.service: The configuration file for the Gunicorn WSGI HTTP server.
+2. If the configuration file does not exist or does not match, configure Nginx using the specified template file.
+
+3. Check if the Nginx site is enabled and if it matches the desired configuration.
+
+4. If the site is not enabled or does not match, enable it by creating a symbolic link to the configuration file.
+
+5. Check if the specified Gunicorn port is available. If not, find an available port by incrementing the port number.
+
+6. Update the Gunicorn service configuration file to use the new port.
+
+7. Restart Gunicorn and Nginx to apply the changes.
+
+8. supervisor.conf: This file is the configuration file for the Supervisor process control system. It specifies how Supervisor should manage the  
+   Gunicorn process running the Django app.
+
+9. gunicorn.service: This file is the configuration file for the Gunicorn WSGI HTTP server. It defines the settings and options for running the Django  app with Gunicorn.
 
 # Notes
 
