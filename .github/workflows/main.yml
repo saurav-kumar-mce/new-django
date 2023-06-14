@@ -73,7 +73,12 @@ jobs:
         run: |
           echo "HOSTNAME=$(echo ${{ steps.ec2-public-ip.outputs.public_ip }})" >> $GITHUB_ENV
 
-  
+      - name: Update inventory.ini
+        run: |
+          echo "[webservers]" > devops/ansible/inventory.ini
+          echo "${{ steps.ec2-public-ip.outputs.public_ip }}" >> devops/ansible/inventory.ini
+
+
       - name: Install Ansible on EC2
         env:
           PRIVATE_KEY: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
