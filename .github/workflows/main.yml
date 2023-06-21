@@ -72,15 +72,7 @@ jobs:
             echo "EC2 instance $INSTANCE_ID is in state: $INSTANCE_STATE. Waiting for it to be running..."
             sleep $INTERVAL_SECONDS
             SECONDS_PASSED=$((SECONDS_PASSED + $INTERVAL_SECONDS))
-          done
-
-      - name: Get EC2 Public IP
-        id: ec2-public-ip
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}        
+          done        
 
       - name: Get EC2 Public IP
         id: ec2-public-ip
