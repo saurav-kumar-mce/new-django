@@ -52,27 +52,27 @@ jobs:
       - name: Wait for EC2 instance to be created
         id: wait-for-instance
         run: |
-          INSTANCE_ID=${{ steps.apply.outputs.instance_id }}
+          PREVIOUS_INSTANCE_ID=${{ steps.apply.outputs.instance_id }}
           TIMEOUT_SECONDS=600
           INTERVAL_SECONDS=10
-          
-          echo "Waiting for EC2 instance $INSTANCE_ID to be in running state..."
-          
+
+          echo "Waiting for EC2 instance to be created..."
+
           SECONDS_PASSED=0
           while true; do
-            INSTANCE_STATE=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[].Instances[].State[].Name' --output text)
-            if [ "$INSTANCE_STATE" = "running" ]; then
-              echo "EC2 instance $INSTANCE_ID is now running."
+            INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=image-id,Values=${{ secrets.TF_VAR_AMI }}" --query 'Reservations[].Instances[].InstanceId' --output text)
+            if [ "$INSTANCE_ID" != "$PREVIOUS_INSTANCE_ID" ]; then
+              echo "New EC2 instance $INSTANCE_ID created."
               break
             fi
             if [ $SECONDS_PASSED -ge $TIMEOUT_SECONDS ]; then
-              echo "Timed out waiting for EC2 instance $INSTANCE_ID to be running."
+              echo "Timed out waiting for new EC2 instance to be created."
               exit 1
             fi
-            echo "EC2 instance $INSTANCE_ID is in state: $INSTANCE_STATE. Waiting for it to be running..."
+            echo "Waiting for new EC2 instance to be created..."
             sleep $INTERVAL_SECONDS
             SECONDS_PASSED=$((SECONDS_PASSED + $INTERVAL_SECONDS))
-          done        
+          done      
 
       - name: Get EC2 Public IP
         id: ec2-public-ip
