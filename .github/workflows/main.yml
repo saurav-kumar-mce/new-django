@@ -115,7 +115,7 @@ jobs:
           USER_NAME: ${{ env.EC2_INSTANCE_USERNAME }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ansible-playbook -i devops/ansible/inventory.ini devops/ansible/playbook.yml -u ubuntu --private-key private_key -vvv
+          ansible-playbook -i devops/ansible/inventory.ini devops/ansible/playbook.yml -u ubuntu --private-key private_key --extra-vars "gunicorn_port=8000" -vvv
 
       - name: Visit Deployed Django App
         run: |
