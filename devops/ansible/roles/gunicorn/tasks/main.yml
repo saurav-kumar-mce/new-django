@@ -1,3 +1,12 @@
+- name: Ensure gunicorn configuration file exists
+  copy:
+    content: ""
+    dest: "{{ supervisor_conf_path }}"
+    force: no
+    mode: '0644'
+    owner: root
+    group: root
+
 - name: Check if Gunicorn service exists
   stat:
     path: "{{ gunicorn_service_path }}"
@@ -26,7 +35,7 @@
   shell: |
     source /home/ubuntu/new-django/venv/bin/activate
     cd /home/ubuntu/new-django/
-    gunicorn todoApp.wsgi:application --bind 0.0.0.0:8002
+    gunicorn todoApp.wsgi:application --bind 0.0.0.0:8000
   environment:
     PATH: "/home/ubuntu/new-django/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   notify:

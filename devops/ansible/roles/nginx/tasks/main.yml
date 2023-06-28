@@ -9,13 +9,13 @@
   ignore_errors: true
 
 - name: Configure Nginx
-  template:
+  copy:
     src: "{{ app_path }}/devops/nginx.conf.j2"
     dest: "{{ nginx_conf_path }}"
     mode: '0644'
     remote_src: yes
-  notify:  
-    - Reload Nginx
+#  notify:  
+#    - Reload Nginx
   when:
     - nginx_conf_stat.stat.exists == false
     - nginx_conf_diff.rc != 0
@@ -30,8 +30,8 @@
     src: "{{ nginx_conf_path }}"
     dest: "/etc/nginx/sites-enabled/django"
     state: link
-  notify:
-    - Reload Nginx
+#  notify:
+#    - Reload Nginx
   when:
     - nginx_site_enabled.stat.exists == false
     - nginx_conf_diff.rc != 0
@@ -55,11 +55,11 @@
     line: "ExecStart=/usr/bin/gunicorn --bind 127.0.0.1:{{ new_gunicorn_port|int + 1 }} myproject.wsgi:application"
   when: port_check.failed
 
-- name: Restart Gunicorn
-  systemd:
-    name: gunicorn
-    state: restarted
-  when: port_check.failed
+#- name: Restart Gunicorn
+#  systemd:
+#    name: gunicorn
+#    state: restarted
+#  when: port_check.failed
 
 - name: Restart Nginx
   systemd:
