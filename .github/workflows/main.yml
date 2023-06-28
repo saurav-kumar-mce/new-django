@@ -120,6 +120,8 @@ jobs:
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ansible-playbook -i devops/ansible/inventory.ini devops/ansible/playbook.yml -u ubuntu --private-key private_key --extra-vars "gunicorn_port=8000" -vvv
 
-#      - name: Visit Deployed Django App
-#        run: |
-#          echo "Visit the deployed Django app: http://${{ steps.extract-public-ip.outputs.public_ip }}:8000/todos"        
+      - name: Display Deployment Message
+        run: |
+          echo "Django app has been deployed!"
+          echo "You can access the app at: http://${{ steps.extract-public-ip.outputs.public_ip }}:8000/todos"
+      
